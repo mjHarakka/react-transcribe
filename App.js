@@ -1,13 +1,30 @@
 import { useState } from 'react'
 import { StatusBar } from 'expo-status-bar'
+import { StyleSheet, View, FlatList } from 'react-native'
 import {
-  StyleSheet,
-  Text,
-  View,
+  PaperProvider,
   TextInput,
   Button,
-  FlatList,
-} from 'react-native'
+  Text,
+  Divider,
+} from 'react-native-paper'
+
+function NoteList({ notes, onDelete }) {
+  return (
+    <FlatList
+      data={notes}
+      keyExtractor={(item) => String(item.id)}
+      keyboardShouldPersistTaps='handled'
+      ItemSeparatorComponent={Divider}
+      renderItem={({ item }) => (
+        <View style={styles.noteRow}>
+          <Text style={styles.note}>{item.text}</Text>
+          <Button onPress={() => onDelete(item.id)}>Delete</Button>
+        </View>
+      )}
+    />
+  )
+}
 
 export default function App() {
   const [notes, setNotes] = useState([])
@@ -24,26 +41,22 @@ export default function App() {
   }
 
   return (
-    <View style={styles.container}>
-      <TextInput
-        style={styles.input}
-        value={input}
-        onChangeText={setInput}
-        placeholder='New note...'
-      />
-      <Button title='Add' onPress={handleAdd} />
-      <FlatList
-        data={notes}
-        keyExtractor={(item) => String(item.id)}
-        renderItem={({ item }) => (
-          <View style={styles.noteRow}>
-            <Text style={styles.note}>{item.text}</Text>
-            <Button title='Delete' onPress={() => handleDelete(item.id)} />
-          </View>
-        )}
-      />
-      <StatusBar style='auto' />
-    </View>
+    <PaperProvider>
+      <View style={styles.container}>
+        <TextInput
+          mode='outlined'
+          label='New note'
+          value={input}
+          onChangeText={setInput}
+          style={styles.input}
+        />
+        <Button mode='contained' onPress={handleAdd} style={styles.addButton}>
+          Add
+        </Button>
+        <NoteList notes={notes} onDelete={handleDelete} />
+        <StatusBar style='auto' />
+      </View>
+    </PaperProvider>
   )
 }
 
@@ -55,21 +68,18 @@ const styles = StyleSheet.create({
     paddingTop: 60,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 6,
-    padding: 8,
     marginBottom: 8,
+  },
+  addButton: {
+    marginBottom: 16,
   },
   noteRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    paddingVertical: 4,
   },
   note: {
     flex: 1,
-    paddingVertical: 8,
   },
 })
