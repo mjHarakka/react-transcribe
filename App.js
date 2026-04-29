@@ -9,24 +9,18 @@ import {
   FlatList,
 } from 'react-native'
 
-function useNotes() {
-  const [notes, setNotes] = useState([])
-
-  function addNote(text) {
-    setNotes((prev) => [...prev, { id: Date.now(), text }])
-  }
-
-  return { notes, addNote }
-}
-
 export default function App() {
-  const { notes, addNote } = useNotes()
+  const [notes, setNotes] = useState([])
   const [input, setInput] = useState('')
 
   function handleAdd() {
     if (!input.trim()) return
-    addNote(input.trim())
+    setNotes((prev) => [...prev, { id: Date.now(), text: input.trim() }])
     setInput('')
+  }
+
+  function handleDelete(id) {
+    setNotes((prev) => prev.filter((note) => note.id !== id))
   }
 
   return (
@@ -41,7 +35,12 @@ export default function App() {
       <FlatList
         data={notes}
         keyExtractor={(item) => String(item.id)}
-        renderItem={({ item }) => <Text style={styles.note}>{item.text}</Text>}
+        renderItem={({ item }) => (
+          <View style={styles.noteRow}>
+            <Text style={styles.note}>{item.text}</Text>
+            <Button title='Delete' onPress={() => handleDelete(item.id)} />
+          </View>
+        )}
       />
       <StatusBar style='auto' />
     </View>
@@ -62,9 +61,15 @@ const styles = StyleSheet.create({
     padding: 8,
     marginBottom: 8,
   },
-  note: {
-    paddingVertical: 8,
+  noteRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
+  },
+  note: {
+    flex: 1,
+    paddingVertical: 8,
   },
 })
