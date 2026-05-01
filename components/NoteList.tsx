@@ -1,4 +1,4 @@
-import { StyleSheet, View, FlatList } from 'react-native'
+import { StyleSheet, View, FlatList, TouchableOpacity } from 'react-native'
 import { IconButton, Surface, Text } from 'react-native-paper'
 import { Note } from '../db/notes'
 import AudioPlayer from './AudioPlayer'
@@ -6,9 +6,10 @@ import AudioPlayer from './AudioPlayer'
 type Props = {
   notes: Note[]
   onDelete: (id: number) => void
+  onPress: (note: Note) => void
 }
 
-export default function NoteList({ notes, onDelete }: Props) {
+export default function NoteList({ notes, onDelete, onPress }: Props) {
   return (
     <FlatList
       data={notes}
@@ -16,21 +17,23 @@ export default function NoteList({ notes, onDelete }: Props) {
       keyboardShouldPersistTaps='handled'
       contentContainerStyle={styles.list}
       renderItem={({ item }) => (
-        <Surface style={styles.card} elevation={1}>
-          <View style={styles.cardContent}>
-            <Text variant='titleMedium' style={styles.name} numberOfLines={1}>
-              {item.name || 'Untitled'}
-            </Text>
-            <View style={styles.actions}>
-              <AudioPlayer uri={item.text} />
-              <IconButton
-                icon='trash-can-outline'
-                size={22}
-                onPress={() => onDelete(item.id)}
-              />
+        <TouchableOpacity activeOpacity={0.7} onPress={() => onPress(item)}>
+          <Surface style={styles.card} elevation={1}>
+            <View style={styles.cardContent}>
+              <Text variant='titleMedium' style={styles.name} numberOfLines={1}>
+                {item.name || 'Untitled'}
+              </Text>
+              <View style={styles.actions}>
+                <AudioPlayer uri={item.text} />
+                <IconButton
+                  icon='trash-can-outline'
+                  size={22}
+                  onPress={() => onDelete(item.id)}
+                />
+              </View>
             </View>
-          </View>
-        </Surface>
+          </Surface>
+        </TouchableOpacity>
       )}
     />
   )
