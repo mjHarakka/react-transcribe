@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, View, ScrollView } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Text, IconButton } from 'react-native-paper'
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native'
@@ -26,12 +26,24 @@ export default function NoteDetail() {
         <IconButton icon="arrow-left" size={24} onPress={() => navigation.goBack()} />
         <IconButton icon="trash-can-outline" size={24} onPress={handleDelete} />
       </View>
-      <View style={styles.content}>
+      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
         <Text variant="labelMedium" style={styles.label}>VOICE RECORDING</Text>
         <Text variant="headlineSmall" style={styles.title}>{note.name}</Text>
-        <View style={styles.player}>
-          <AudioPlayer uri={note.text} />
-        </View>
+        {note.summary && (
+          <View style={styles.section}>
+            <Text variant="labelMedium" style={styles.label}>SUMMARY</Text>
+            <Text variant="bodyMedium">{note.summary}</Text>
+          </View>
+        )}
+        {note.transcription && (
+          <View style={styles.section}>
+            <Text variant="labelMedium" style={styles.label}>TRANSCRIPTION</Text>
+            <Text variant="bodyMedium">{note.transcription}</Text>
+          </View>
+        )}
+      </ScrollView>
+      <View style={styles.playbar}>
+        <AudioPlayer uri={note.text} iconColor="#fff" size={48} />
       </View>
     </SafeAreaView>
   )
@@ -50,8 +62,11 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+  },
+  contentContainer: {
     paddingHorizontal: 24,
     paddingTop: 24,
+    paddingBottom: 16,
   },
   label: {
     color: '#888',
@@ -62,7 +77,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 32,
   },
-  player: {
-    alignItems: 'flex-start',
+  section: {
+    marginTop: 32,
+  },
+  playbar: {
+    backgroundColor: '#1a1a1a',
+    paddingVertical: 8,
+    alignItems: 'center',
   },
 })

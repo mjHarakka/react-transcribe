@@ -3,15 +3,18 @@ import { usePlayer } from '../hooks/usePlayer'
 
 type Props = {
   uri: string
+  iconColor?: string
+  size?: number
 }
 
-export default function AudioPlayer({ uri }: Props) {
+export default function AudioPlayer({ uri, iconColor, size = 28 }: Props) {
   const { isPlaying, play, stop } = usePlayer()
 
   return (
     <IconButton
       icon={isPlaying ? 'stop-circle' : 'play-circle'}
-      size={28}
+      size={size}
+      iconColor={iconColor}
       onPress={isPlaying ? stop : () => play(uri)}
     />
   )

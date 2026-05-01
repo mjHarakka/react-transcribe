@@ -3,7 +3,7 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { setupDatabase, getNotes, insertNote, deleteNote, Note } from '../db/notes'
+import { setupDatabase, getNotes, insertNote, deleteNote, updateNoteTranscription, Note } from '../db/notes'
 import NoteList from '../components/NoteList'
 import { useRecorder } from '../hooks/useRecorder'
 import { RootStackParamList } from '../App'
@@ -34,7 +34,12 @@ export default function HomeScreen() {
     if (isRecording) {
       const uri = await stopRecording()
       if (uri) {
-        insertNote(new Date().toLocaleString(), uri)
+        const id = insertNote(new Date().toLocaleString(), uri)
+        updateNoteTranscription(
+          id,
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+          'Lorem ipsum summary: Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.'
+        )
         setNotes(getNotes())
       }
     } else {
