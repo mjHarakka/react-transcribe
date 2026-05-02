@@ -1,10 +1,11 @@
+import { useEffect, useState } from 'react'
 import { StyleSheet, View, ScrollView } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Text, IconButton } from 'react-native-paper'
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../App'
-import { deleteNote } from '../db/notes'
+import { getNoteById, deleteNote, Note } from '../db/notes'
 import AudioPlayer from '../components/AudioPlayer'
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'NoteDetail'>
@@ -13,12 +14,25 @@ type RouteType = RouteProp<RootStackParamList, 'NoteDetail'>
 export default function NoteDetail() {
   const navigation = useNavigation<NavigationProp>()
   const route = useRoute<RouteType>()
-  const { note } = route.params
+  const { id } = route.params
+  const [note, setNote] = useState<Note | null>(getNoteById(id))
+
+  useEffect(() => {
+    if (note?.transcription) return
+    const interval = setInterval(() => {
+      const fresh = getNoteById(id)
+      setNote(fresh)
+      if (fresh?.transcription) clearInterval(interval)
+    }, 2000)
+    return () => clearInterval(interval)
+  }, [id, note?.transcription])
 
   function handleDelete() {
-    deleteNote(note.id)
+    deleteNote(id)
     navigation.goBack()
   }
+
+  if (!note) return null
 
   return (
     <SafeAreaView style={styles.container}>
@@ -39,6 +53,11 @@ export default function NoteDetail() {
           <View style={styles.section}>
             <Text variant="labelMedium" style={styles.label}>TRANSCRIPTION</Text>
             <Text variant="bodyMedium">{note.transcription}</Text>
+          </View>
+        )}
+        {!note.transcription && (
+          <View style={styles.section}>
+            <Text variant="bodyMedium" style={styles.pending}>Transcribing...</Text>
           </View>
         )}
       </ScrollView>
@@ -79,6 +98,10 @@ const styles = StyleSheet.create({
   },
   section: {
     marginTop: 32,
+  },
+  pending: {
+    color: '#888',
+    fontStyle: 'italic',
   },
   playbar: {
     backgroundColor: '#1a1a1a',

@@ -1,13 +1,13 @@
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { PaperProvider } from 'react-native-paper'
-import { Note } from './db/notes'
+
 import HomeScreen from './screens/HomeScreen'
 import NoteDetail from './screens/NoteDetail'
 
 export type RootStackParamList = {
   Home: undefined
-  NoteDetail: { note: Note }
+  NoteDetail: { id: number }
 }
 
 const Stack = createNativeStackNavigator<RootStackParamList>()

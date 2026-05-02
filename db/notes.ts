@@ -28,6 +28,10 @@ export function getNotes(): Note[] {
   return db.getAllSync<Note>('SELECT * FROM notes ORDER BY id DESC;')
 }
 
+export function getNoteById(id: number): Note | null {
+  return db.getFirstSync<Note>('SELECT * FROM notes WHERE id = ?;', [id]) ?? null
+}
+
 export function insertNote(name: string, text: string): number {
   const result = db.runSync('INSERT INTO notes (name, text) VALUES (?, ?);', [name, text])
   return result.lastInsertRowId
