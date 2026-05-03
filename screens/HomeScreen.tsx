@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { StyleSheet, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, TouchableOpacity, View, Text } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -13,7 +13,8 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>
 
 export default function HomeScreen() {
   const [notes, setNotes] = useState<Note[]>([])
-  const { isRecording, startRecording, stopRecording } = useRecorder()
+  const { isRecording, duration, startRecording, stopRecording } = useRecorder()
+  const durationLabel = `${Math.floor(duration / 60).toString().padStart(2, '0')}:${(duration % 60).toString().padStart(2, '0')}`
   const navigation = useNavigation<NavigationProp>()
 
   useEffect(() => {
@@ -58,6 +59,7 @@ export default function HomeScreen() {
         <StatusBar style="light" />
       </View>
       <View style={styles.toolbar}>
+        {isRecording && <Text style={styles.timer}>{durationLabel}</Text>}
         <TouchableOpacity
           style={[styles.recordButton, isRecording && styles.recordButtonActive]}
           onPress={handleRecord}
@@ -81,6 +83,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#1a1a1a',
     paddingVertical: 20,
     alignItems: 'center',
+  },
+  timer: {
+    color: '#fff',
+    fontSize: 16,
+    fontVariant: ['tabular-nums'],
+    marginBottom: 8,
   },
   recordButton: {
     width: 64,

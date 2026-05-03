@@ -1,4 +1,4 @@
-import { StyleSheet, View, FlatList, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, FlatList, TouchableOpacity, Alert } from 'react-native'
 import { IconButton, Surface, Text } from 'react-native-paper'
 import { Note } from '../db/notes'
 import AudioPlayer from './AudioPlayer'
@@ -16,6 +16,14 @@ export default function NoteList({ notes, onDelete, onPress }: Props) {
       keyExtractor={(item) => String(item.id)}
       keyboardShouldPersistTaps='handled'
       contentContainerStyle={styles.list}
+      ListEmptyComponent={
+        <View style={styles.empty}>
+          <Text variant='headlineSmall' style={styles.emptyTitle}>No recordings yet</Text>
+          <Text variant='bodyMedium' style={styles.emptyHint}>
+            Just start recording and I will transcribe it for you
+          </Text>
+        </View>
+      }
       renderItem={({ item }) => (
         <TouchableOpacity activeOpacity={0.7} onPress={() => onPress(item)}>
           <Surface style={styles.card} elevation={1}>
@@ -28,7 +36,12 @@ export default function NoteList({ notes, onDelete, onPress }: Props) {
                 <IconButton
                   icon='trash-can-outline'
                   size={22}
-                  onPress={() => onDelete(item.id)}
+                  onPress={() =>
+                    Alert.alert('Delete recording', 'This cannot be undone.', [
+                      { text: 'Cancel', style: 'cancel' },
+                      { text: 'Delete', style: 'destructive', onPress: () => onDelete(item.id) },
+                    ])
+                  }
                 />
               </View>
             </View>
@@ -43,6 +56,22 @@ const styles = StyleSheet.create({
   list: {
     padding: 12,
     gap: 8,
+    flexGrow: 1,
+  },
+  empty: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 40,
+    gap: 12,
+  },
+  emptyTitle: {
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  emptyHint: {
+    color: '#888',
+    textAlign: 'center',
   },
   card: {
     borderRadius: 12,

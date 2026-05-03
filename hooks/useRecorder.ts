@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Audio } from 'expo-av'
 import * as FileSystem from 'expo-file-system/legacy'
 
 export function useRecorder() {
   const [recording, setRecording] = useState<Audio.Recording | null>(null)
   const [isRecording, setIsRecording] = useState(false)
+  const [duration, setDuration] = useState(0)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   async function startRecording() {
     await Audio.requestPermissionsAsync()
@@ -15,10 +17,18 @@ export function useRecorder() {
     )
     setRecording(recording)
     setIsRecording(true)
+    setDuration(0)
+    intervalRef.current = setInterval(() => setDuration(d => d + 1), 1000)
   }
 
   async function stopRecording(): Promise<string | null> {
     if (!recording) return null
+
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
+    }
+    setDuration(0)
 
     await recording.stopAndUnloadAsync()
     const tempUri = recording.getURI()
@@ -32,5 +42,5 @@ export function useRecorder() {
     return destination
   }
 
-  return { isRecording, startRecording, stopRecording }
+  return { isRecording, duration, startRecording, stopRecording }
 }

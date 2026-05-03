@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { StyleSheet, View, ScrollView } from 'react-native'
+import { StyleSheet, View, ScrollView, Alert } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Text, IconButton } from 'react-native-paper'
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native'
@@ -28,8 +28,10 @@ export default function NoteDetail() {
   }, [id, note?.transcription])
 
   function handleDelete() {
-    deleteNote(id)
-    navigation.goBack()
+    Alert.alert('Delete recording', 'This cannot be undone.', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Delete', style: 'destructive', onPress: () => { deleteNote(id); navigation.goBack() } },
+    ])
   }
 
   if (!note) return null
